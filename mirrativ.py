@@ -46,11 +46,6 @@ class Mirrativ:
                 'x-referer': 'my_page',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
             insecure_skip_verify=True
         )
         if resp.status_code != 200:
@@ -67,11 +62,6 @@ class Mirrativ:
                 'x-referer': 'home.select',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
             insecure_skip_verify=True
         )
         if resp.status_code != 200:
@@ -94,11 +84,6 @@ class Mirrativ:
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
             insecure_skip_verify=True
         )
         if resp.status_code != 200:
@@ -121,11 +106,6 @@ class Mirrativ:
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
             insecure_skip_verify=True
         )
         if resp.status_code != 200:
@@ -148,11 +128,6 @@ class Mirrativ:
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
             insecure_skip_verify=True
         )
         if resp.status_code != 200:
@@ -177,11 +152,6 @@ class Mirrativ:
                 'Connection': 'keep-alive',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
             insecure_skip_verify=True
         )
 
@@ -200,7 +170,7 @@ class Mirrativ:
             return
 
         if live_status.is_private == 1:
-            self.logger.error('配信はプライベートです')
+            self.logger.error('この配信はプライベートです')
             return
 
         # Send JoinLog
@@ -226,11 +196,6 @@ class Mirrativ:
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
             insecure_skip_verify=True
         )
         if resp.status_code != 200:
@@ -260,14 +225,6 @@ class Mirrativ:
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             }),
-            # cookies={
-            #     'lang': self.lang,
-            #     'mr_id': self.id,
-            #     'f': self.unique
-            # },
-            proxy={
-                'http': 'http://localhost:8788'
-            },
             insecure_skip_verify=True
         )
         if resp.status_code != 200:
