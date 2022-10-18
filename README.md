@@ -1,5 +1,6 @@
 # pytive
-Mirrativのコメントをpythonで！
+Mirrativのコメントをpythonで！  
+これは人生初のpythonで、コードが汚い可能性？
 
 ## 使い方
 ### ログイン
