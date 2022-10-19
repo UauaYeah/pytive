@@ -9,20 +9,24 @@ Mirrativのコメントをpythonで！
 
 ## 使い方
 ### ログイン
-```python
-import pytive
 
-client = pytive.Mirrativ() 
+```python
+from pytive import Pytive
+
+client = Pytive()
 # クッキー
 client.login('mr_idをここに', 'fをここに')
 ```
 ### メッセージ送信
+
 ```python
 # ...mirrativ.com/live/'ここ'
+from pytive import CommentType
+
 live_id = ''
 
 client.join_live(live_id)
-client.comment(live_id, 1, 'pog')
+client.comment(live_id, CommentType.NORMAL, 'pog')
 ```
 ### ライブリクエスト
 ```python

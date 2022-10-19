@@ -2,10 +2,10 @@ from logging import getLogger, basicConfig, DEBUG
 from random import randrange, choices
 
 import json
-import pytive
 import requests
 import string
 
+from pytive import Pytive
 from attrdict import AttrDict
 
 logger = getLogger("Pytive")
@@ -20,7 +20,7 @@ def letters(length: int):
    return ''.join(choices(string.ascii_letters + string.digits, k=length))
 
 def generate_test():
-    client = pytive.Mirrativ()
+    client = Pytive()
 
     obtain_cookies = session.get(
         'https://www.mirrativ.com/api/user/me',

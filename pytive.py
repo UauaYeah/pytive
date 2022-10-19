@@ -1,5 +1,6 @@
 from logging import getLogger, basicConfig, INFO
 from typing import Optional
+from enum import Enum
 
 import requests
 import secrets
@@ -13,7 +14,11 @@ basicConfig(
     format='[%(levelname)s] %(message)s'
 )
 
-class Mirrativ:
+class CommentType(Enum):
+    NORMAL: int = 1
+    JOIN_LOG: int = 3
+
+class Pytive:
     def __init__(self):
         self.session = requests.session()
         self.user_agent = 'MR_APP/9.84.0/StiffCock/F4-RT/1.33.7'
@@ -36,7 +41,7 @@ class Mirrativ:
         self.id = id
         self.unique = unique
 
-    def my_info(self) -> Optional[AttrDict]:
+    def my_profile(self) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/user/me',
             headers=dict(**self.common_headers, **{
@@ -45,6 +50,25 @@ class Mirrativ:
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'x-referer': 'my_page',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        if resp.status_code != 200:
+            return None
+        return AttrDict(resp.json())
+
+    def profile(self, user_id: str) -> Optional[AttrDict]:
+        resp = self.session.get(
+            'https://www.mirrativ.com/api/user/profile',
+            params={
+                'user_id': user_id
+            },
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'profile',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             })
         )
@@ -164,7 +188,7 @@ class Mirrativ:
             logger.error('配信情報の取得に失敗しました')
             return
 
-        notice_resp = self.session.get(
+        if self.session.get(
             'https://www.mirrativ.com/api/event/notice',
             params={
                 'type': '2',
@@ -177,7 +201,8 @@ class Mirrativ:
                 'Connection': 'keep-alive',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             })
-        )
+        ).status_code != 200:
+            return
 
         live_comments = self.live_comments(live_id)
         if live_comments is None:
@@ -222,10 +247,6 @@ class Mirrativ:
             return None
         return AttrDict(resp.json())
 
-    # Type
-    # 1 = Normal Message,
-    # 2 = ???,
-    # 3 = Join Message
     def comment(self, live_id: str, type: int, message: str):
         if live_id is None:
             return
