@@ -1,9 +1,9 @@
-import mirrativ
+import pytive
 
 def message_test():
     live_id = ''
 
-    client = mirrativ.Mirrativ()
+    client = pytive.Mirrativ()
     client.login('', '')
 
     client.join_live(live_id)

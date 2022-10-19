@@ -1,21 +1,12 @@
 from attrdict import AttrDict
 
-import tls_client, secrets, uuid, json
+import requests, secrets, uuid, json
 import main
 
 class Mirrativ:
     def __init__(self):
         self.logger = main.logger
-        self.session = tls_client.Session(
-            # You can also use the following as `client_identifier`:
-            # Chrome --> chrome_103, chrome_104, chrome_105
-            # Firefox --> firefox_102, firefox_104
-            # Opera --> opera_89, opera_90
-            # Safari --> safari_15_3, safari_15_6_1, safari_16_0
-            # iOS --> safari_ios_15_5, safari_ios_15_6, safari_ios_16_0
-            # iPadOS --> safari_ios_15_6
-            client_identifier='chrome_105'
-        )
+        self.session = requests.session()
         self.user_agent = 'MR_APP/9.84.0/StiffCock/F4-RT/1.33.7'
         self.common_headers = {
             'HTTP_X_TIMEZONE': 'Asia/Tokyo',
@@ -28,9 +19,9 @@ class Mirrativ:
             'x-adjust-adid': secrets.token_hex(int(33 / 2))
         }
 
-        self.lang = 'ja' # Language
-        self.id = ''     # Mirrativ Id
-        self.unique = '' # Account UUID
+        self.lang   = 'ja' # Language
+        self.id     = ''   # Mirrativ Id
+        self.unique = ''   # Account UUID
 
     def login(self, id: str, unique: str):
         self.id = id
@@ -41,32 +32,32 @@ class Mirrativ:
             'https://www.mirrativ.com/api/user/me',
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'x-referer': 'my_page',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
         if resp.status_code != 200:
             return None
-        return AttrDict(json.loads(resp.text))
+        return AttrDict(resp.json())
 
     def onlive_apps(self):
         resp = self.session.get(
             'https://www.mirrativ.com/api/app/onlive_apps',
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'x-referer': 'home.select',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
         if resp.status_code != 200:
             return None
-        return AttrDict(json.loads(resp.text))
+        return AttrDict(resp.json())
 
     def live_info(self, live_id: str):
         if live_id is None:
@@ -79,16 +70,16 @@ class Mirrativ:
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
         if resp.status_code != 200:
             return None
-        return AttrDict(json.loads(resp.text))
+        return AttrDict(resp.json())
 
     def live_status(self, live_id: str):
         if live_id is None:
@@ -101,16 +92,16 @@ class Mirrativ:
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
         if resp.status_code != 200:
             return None
-        return AttrDict(json.loads(resp.text))
+        return AttrDict(resp.json())
 
     def live_comments(self, live_id: str):
         if live_id is None:
@@ -123,16 +114,40 @@ class Mirrativ:
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
         if resp.status_code != 200:
             return None
-        return AttrDict(json.loads(resp.text))
+        return AttrDict(resp.json())
+
+    def live_polling(self, live_id: str):
+        if live_id is None:
+            return None
+
+        resp = self.session.post(
+            'https://www.mirrativ.com/api/live/live_polling',
+            data={
+                'live_id': live_id,
+                'live_user_key': '', # ???
+                'is_ui_hidden': '0'
+            },
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'live_view',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        if resp.status_code != 200:
+            return None
+        return AttrDict(resp.json())
 
     def join_live(self, live_id: str):
         live_info = self.live_info(live_id)
@@ -148,11 +163,11 @@ class Mirrativ:
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
 
         live_comments = self.live_comments(live_id)
@@ -176,31 +191,27 @@ class Mirrativ:
         # Send JoinLog
         self.comment(live_id, 3, '')
 
-    # TODO
-    def polling(self, live_id: str):
-        if live_id is None:
-            return None
-
+    def request_live(self, user_id: str, count: int = 1):
         resp = self.session.post(
-            'https://www.mirrativ.com/api/live/live_polling',
+            'https://www.mirrativ.com/api/user/post_live_request',
             data={
-                'live_id': live_id,
-                'live_user_key': '', # ???
-                'is_ui_hidden': '0'
+                'count': str(count),
+                'user_id': user_id,
+                'where': 'profile'
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
-                'x-referer': 'live_view',
+                'x-referer': 'profile',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
         if resp.status_code != 200:
+            self.logger.error('ライブリクエストに失敗しました (Code: {})'.format(resp.status_code))
             return None
-        return AttrDict(json.loads(resp.text))
+        return AttrDict(resp.json())
 
     # Type
     # 1 = Normal Message,
@@ -219,13 +230,12 @@ class Mirrativ:
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
-                'Content-Type': 'application/x-www-form-urlencoded',
+                'Accept': '*/*',
                 'Accept-Language': 'ja-jp',
                 'Connection': 'keep-alive',
                 'x-referer': 'live_view',
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
-            }),
-            insecure_skip_verify=True
+            })
         )
         if resp.status_code != 200:
-            self.logger.error('コメントの送信に失敗しました')
+            self.logger.error('コメントの送信に失敗しました (Code: {})'.format(resp.status_code))

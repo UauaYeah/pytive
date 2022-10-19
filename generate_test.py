@@ -2,7 +2,7 @@ from logging import getLogger, basicConfig, DEBUG
 from attrdict import AttrDict
 from random import randrange, choices
 
-import mirrativ, requests, string, json
+import pytive, requests, string, json
 
 logger = getLogger("Average")
 basicConfig(
@@ -11,13 +11,12 @@ basicConfig(
 )
 
 session = requests.session()
-# session.verify = False
 
-def rand(length: int):
+def letters(length: int):
    return ''.join(choices(string.ascii_letters + string.digits, k=length))
 
 def generate_test():
-    client = mirrativ.Mirrativ()
+    client = pytive.Mirrativ()
 
     obtain_cookies = session.get(
         'https://www.mirrativ.com/api/user/me',
@@ -40,7 +39,7 @@ def generate_test():
         'https://www.mirrativ.com/api/user/profile_edit',
         data={
             'user_id': user_id,
-            'name': rand(6),
+            'name': letters(6),
             'description': 'no more',
             'include_urge_users': '1',
             'dynamic_link': ''
