@@ -325,6 +325,7 @@ class Pytive:
         if resp.status_code != 200:
             logger.error('コメントの送信に失敗しました (Code: {})'.format(resp.status_code))
 
+    # TODO 🤔
     def follow(self, user_id: str) -> Optional[AttrDict]:
         resp = self.session.post(
             'https://www.mirrativ.com/api/graph/follow',
@@ -340,7 +341,7 @@ class Pytive:
                 'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
             })
         )
-        # if resp.status_code != 200:
-        #     logger.error('フォローに失敗しました')
-        #     return None
+        if resp.status_code != 200:
+            logger.error('フォローに失敗しました')
+            return None
         return AttrDict(resp.json())
