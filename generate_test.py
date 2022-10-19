@@ -5,8 +5,8 @@ import json
 import requests
 import string
 
-from pytive import Pytive
 from attrdict import AttrDict
+from pytive import Pytive
 
 logger = getLogger("Pytive")
 basicConfig(
@@ -95,33 +95,7 @@ def generate_test():
             'f': client.unique
         }
     ).status_code != 200:
-        logger.error('Error 1')
-        return
-
-    if session.post(
-        'https://www.mirrativ.com/api/app/add_my_app',
-        json={
-            'app_ids': [
-                'com.mojang.minecraftpe',
-                'livegame.mirrativ.emomorun',
-                'com.netease.hyxd'
-            ]
-        },
-        headers=dict(**client.common_headers, **{
-            'User-Agent': client.user_agent,
-            'Accept-Language': 'ja-JP',
-            'Accept-Encoding': 'gzip',
-            'Accept': '*/*',
-            'Connection': 'keep-alive',
-            'x-referer': 'tutorial'
-        }),
-        cookies={
-            'lang': client.lang,
-            'mr_id': client.id,
-            'f': client.unique
-        }
-    ).status_code != 200:
-        logger.error('Error 2')
+        logger.error('統計の送信に失敗しました')
         return
 
     logger.info('{}:{}'.format(

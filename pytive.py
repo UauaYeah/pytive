@@ -21,7 +21,7 @@ class CommentType(Enum):
 class Pytive:
     def __init__(self):
         self.session = requests.session()
-        self.user_agent = 'MR_APP/9.84.0/StiffCock/F4-RT/1.33.7'
+        self.user_agent = 'MR_APP/9.85.0/StiffCock/F4-RT/13.37.0'
         self.common_headers = {
             'HTTP_X_TIMEZONE': 'Asia/Tokyo',
             'x-idfv': secrets.token_hex(int(17 / 2)),
@@ -33,15 +33,15 @@ class Pytive:
             'x-adjust-adid': secrets.token_hex(int(33 / 2))
         }
 
-        self.lang   = 'ja' # Language
-        self.id     = ''   # Mirrativ Id
-        self.unique = ''   # Account UUID
+        self.lang   = 'ja'
+        self.id     = ''
+        self.unique = ''
 
     def login(self, id: str, unique: str):
         self.id = id
         self.unique = unique
 
-    def my_profile(self) -> Optional[AttrDict]:
+    def get_my_profile(self) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/user/me',
             headers=dict(**self.common_headers, **{
@@ -57,7 +57,7 @@ class Pytive:
             return None
         return AttrDict(resp.json())
 
-    def profile(self, user_id: str) -> Optional[AttrDict]:
+    def get_user_profile(self, user_id: str) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/user/profile',
             params={
@@ -76,7 +76,39 @@ class Pytive:
             return None
         return AttrDict(resp.json())
 
-    def onlive_apps(self) -> Optional[AttrDict]:
+    def get_season_rating(self) -> Optional[AttrDict]:
+        resp = self.session.get(
+            'https://www.mirrativ.com/api/season_rating/status',
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'home.select',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        if resp.status_code != 200:
+            return None
+        return AttrDict(resp.json())
+
+    def get_mission_status(self) -> Optional[AttrDict]:
+        resp = self.session.get(
+            'https://www.mirrativ.com/api/mission/status',
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'home.select',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        if resp.status_code != 200:
+            return None
+        return AttrDict(resp.json())
+
+    def get_onlive_apps(self) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/app/onlive_apps',
             headers=dict(**self.common_headers, **{
@@ -92,10 +124,23 @@ class Pytive:
             return None
         return AttrDict(resp.json())
 
-    def live_info(self, live_id: str) -> Optional[AttrDict]:
-        if live_id is None:
+    def get_urge_users(self) -> Optional[AttrDict]:
+        resp = self.session.get(
+            'https://www.mirrativ.com/api/graph/urge_users',
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'home.follow',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        if resp.status_code != 200:
             return None
+        return AttrDict(resp.json())
 
+    def get_info(self, live_id: str) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/live/live',
             params={
@@ -114,10 +159,7 @@ class Pytive:
             return None
         return AttrDict(resp.json())
 
-    def live_status(self, live_id: str) -> Optional[AttrDict]:
-        if live_id is None:
-            return None
-
+    def get_status(self, live_id: str) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/live/get_streaming_url',
             params={
@@ -136,10 +178,7 @@ class Pytive:
             return None
         return AttrDict(resp.json())
 
-    def live_comments(self, live_id: str) -> Optional[AttrDict]:
-        if live_id is None:
-            return None
-
+    def get_comments(self, live_id: str) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/live/live_comments',
             params={
@@ -158,16 +197,11 @@ class Pytive:
             return None
         return AttrDict(resp.json())
 
-    def live_polling(self, live_id: str) -> Optional[AttrDict]:
-        if live_id is None:
-            return None
-
-        resp = self.session.post(
-            'https://www.mirrativ.com/api/live/live_polling',
-            data={
-                'live_id': live_id,
-                'live_user_key': '', # ???
-                'is_ui_hidden': '0'
+    def get_collaborators(self, live_id: str) -> Optional[AttrDict]:
+        resp = self.session.get(
+            'https://www.mirrativ.com/api/collab/collaborating_users',
+            params={
+                'live_id': live_id
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
@@ -183,7 +217,7 @@ class Pytive:
         return AttrDict(resp.json())
 
     def join_live(self, live_id: str):
-        live_info = self.live_info(live_id)
+        live_info = self.get_info(live_id)
         if live_info is None:
             logger.error('配信情報の取得に失敗しました')
             return
@@ -204,12 +238,12 @@ class Pytive:
         ).status_code != 200:
             return
 
-        live_comments = self.live_comments(live_id)
+        live_comments = self.get_comments(live_id)
         if live_comments is None:
             logger.error('コメントの取得に失敗しました')
             return
 
-        live_status = self.live_status(live_id)
+        live_status = self.get_status(live_id)
         if live_info is None:
             logger.error('配信情報の取得に失敗しました')
             return
@@ -225,7 +259,27 @@ class Pytive:
         # Send JoinLog
         self.comment(live_id, 3, '')
 
+    def leave_live(self, live_id: str):
+        self.session.post(
+            'https://www.mirrativ.com/api/live/leave',
+            data={
+                'live_id': live_id
+            },
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+
     def request_live(self, user_id: str, count: int = 1) -> Optional[AttrDict]:
+        if count < 1:
+            count = 1
+        elif count > 2147483646:
+            count = 2147483646
+
         resp = self.session.post(
             'https://www.mirrativ.com/api/user/post_live_request',
             data={
@@ -256,7 +310,8 @@ class Pytive:
             data={
                 'live_id': live_id,
                 'comment': message,
-                'type': str(type)
+                'type': str(type),
+                # 'from_catalog_id': '2'
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
@@ -269,3 +324,23 @@ class Pytive:
         )
         if resp.status_code != 200:
             logger.error('コメントの送信に失敗しました (Code: {})'.format(resp.status_code))
+
+    def follow(self, user_id: str) -> Optional[AttrDict]:
+        resp = self.session.post(
+            'https://www.mirrativ.com/api/graph/follow',
+            data={
+                'user_id': user_id
+            },
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'live_view',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        # if resp.status_code != 200:
+        #     logger.error('フォローに失敗しました')
+        #     return None
+        return AttrDict(resp.json())

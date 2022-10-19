@@ -3,6 +3,7 @@ Mirrativのコメントをpythonで！
 これは人生初のpythonで、コードが汚い可能性？
 
 ## TODO
+- [x] 配信情報の取得
 - [x] コメント機能
 - [ ] フォロー/フォロー解除
 - [x] 配信リクエスト
@@ -20,9 +21,9 @@ client.login('mr_idをここに', 'fをここに')
 ### メッセージ送信
 
 ```python
-# ...mirrativ.com/live/'ここ'
 from pytive import CommentType
 
+# ...mirrativ.com/live/'ここ'
 live_id = ''
 
 client.join_live(live_id)
