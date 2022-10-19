@@ -1,4 +1,5 @@
 from logging import getLogger, basicConfig, INFO
+from typing import Optional
 
 import requests
 import secrets
@@ -35,7 +36,7 @@ class Mirrativ:
         self.id = id
         self.unique = unique
 
-    def my_info(self):
+    def my_info(self) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/user/me',
             headers=dict(**self.common_headers, **{
@@ -51,7 +52,7 @@ class Mirrativ:
             return None
         return AttrDict(resp.json())
 
-    def onlive_apps(self):
+    def onlive_apps(self) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/app/onlive_apps',
             headers=dict(**self.common_headers, **{
@@ -67,7 +68,7 @@ class Mirrativ:
             return None
         return AttrDict(resp.json())
 
-    def live_info(self, live_id: str):
+    def live_info(self, live_id: str) -> Optional[AttrDict]:
         if live_id is None:
             return None
 
@@ -89,7 +90,7 @@ class Mirrativ:
             return None
         return AttrDict(resp.json())
 
-    def live_status(self, live_id: str):
+    def live_status(self, live_id: str) -> Optional[AttrDict]:
         if live_id is None:
             return None
 
@@ -111,7 +112,7 @@ class Mirrativ:
             return None
         return AttrDict(resp.json())
 
-    def live_comments(self, live_id: str):
+    def live_comments(self, live_id: str) -> Optional[AttrDict]:
         if live_id is None:
             return None
 
@@ -133,7 +134,7 @@ class Mirrativ:
             return None
         return AttrDict(resp.json())
 
-    def live_polling(self, live_id: str):
+    def live_polling(self, live_id: str) -> Optional[AttrDict]:
         if live_id is None:
             return None
 
@@ -199,7 +200,7 @@ class Mirrativ:
         # Send JoinLog
         self.comment(live_id, 3, '')
 
-    def request_live(self, user_id: str, count: int = 1):
+    def request_live(self, user_id: str, count: int = 1) -> Optional[AttrDict]:
         resp = self.session.post(
             'https://www.mirrativ.com/api/user/post_live_request',
             data={
