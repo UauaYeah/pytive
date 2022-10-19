@@ -1,11 +1,19 @@
+from logging import getLogger, basicConfig, INFO
+
+import requests
+import secrets
+import uuid
+
 from attrdict import AttrDict
 
-import requests, secrets, uuid, json
-import main
+logger = getLogger('Pytive')
+basicConfig(
+    level=INFO,
+    format='[%(levelname)s] %(message)s'
+)
 
 class Mirrativ:
     def __init__(self):
-        self.logger = main.logger
         self.session = requests.session()
         self.user_agent = 'MR_APP/9.84.0/StiffCock/F4-RT/1.33.7'
         self.common_headers = {
@@ -152,7 +160,7 @@ class Mirrativ:
     def join_live(self, live_id: str):
         live_info = self.live_info(live_id)
         if live_info is None:
-            self.logger.error('配信情報の取得に失敗しました')
+            logger.error('配信情報の取得に失敗しました')
             return
 
         notice_resp = self.session.get(
@@ -172,20 +180,20 @@ class Mirrativ:
 
         live_comments = self.live_comments(live_id)
         if live_comments is None:
-            self.logger.error('コメントの取得に失敗しました')
+            logger.error('コメントの取得に失敗しました')
             return
 
         live_status = self.live_status(live_id)
         if live_info is None:
-            self.logger.error('配信情報の取得に失敗しました')
+            logger.error('配信情報の取得に失敗しました')
             return
 
         if live_status.status.ok != 1 | live_status.is_live == 0:
-            self.logger.error('配信は終了しています')
+            logger.error('配信は終了しています')
             return
 
         if live_status.is_private == 1:
-            self.logger.error('この配信はプライベートです')
+            logger.error('この配信はプライベートです')
             return
 
         # Send JoinLog
@@ -209,7 +217,7 @@ class Mirrativ:
             })
         )
         if resp.status_code != 200:
-            self.logger.error('ライブリクエストに失敗しました (Code: {})'.format(resp.status_code))
+            logger.error('ライブリクエストに失敗しました (Code: {})'.format(resp.status_code))
             return None
         return AttrDict(resp.json())
 
@@ -238,4 +246,4 @@ class Mirrativ:
             })
         )
         if resp.status_code != 200:
-            self.logger.error('コメントの送信に失敗しました (Code: {})'.format(resp.status_code))
+            logger.error('コメントの送信に失敗しました (Code: {})'.format(resp.status_code))

@@ -1,10 +1,14 @@
 from logging import getLogger, basicConfig, DEBUG
-from attrdict import AttrDict
 from random import randrange, choices
 
-import pytive, requests, string, json
+import json
+import pytive
+import requests
+import string
 
-logger = getLogger("Average")
+from attrdict import AttrDict
+
+logger = getLogger("Pytive")
 basicConfig(
     level=DEBUG,
     format="[%(levelname)s] %(message)s"
