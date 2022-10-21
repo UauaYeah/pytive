@@ -43,8 +43,8 @@ def generate_test():
         'https://www.mirrativ.com/api/user/profile_edit',
         data={
             'user_id': user_id,
-            'name': letters(6),
-            'description': 'no more',
+            'name': letters(10),
+            'description': letters(30),
             'include_urge_users': '1',
             'dynamic_link': ''
         },

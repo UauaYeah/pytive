@@ -21,7 +21,7 @@ class CommentType(Enum):
 class Pytive:
     def __init__(self):
         self.session = requests.session()
-        self.user_agent = 'MR_APP/9.85.0/StiffCock/F4-RT/13.37.0'
+        self.user_agent = 'MR_APP/9.85.0/StiffCock/F4-RT/9'
         self.common_headers = {
             'HTTP_X_TIMEZONE': 'Asia/Tokyo',
             'x-idfv': secrets.token_hex(int(17 / 2)),
@@ -30,7 +30,8 @@ class Pytive:
             'x-network-status': '2',
             'x-os-push': '1',
             'x-client-unixtime': '', # TODO
-            'x-adjust-adid': secrets.token_hex(int(33 / 2))
+            'x-adjust-adid': secrets.token_hex(int(33 / 2)),
+            'x-unity-framework': '4.13.0'
         }
 
         self.lang   = 'ja'
@@ -140,6 +141,26 @@ class Pytive:
             return None
         return AttrDict(resp.json())
 
+    def get_catalog(self, cursor: str = ''):
+        resp = self.session.get(
+            'https://www.mirrativ.com/api/live/catalog',
+            params={
+                'id': '2',
+                'cursor': cursor
+            },
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'home',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        if resp.status_code != 200:
+            return None
+        return AttrDict(resp.json())
+
     def get_info(self, live_id: str) -> Optional[AttrDict]:
         resp = self.session.get(
             'https://www.mirrativ.com/api/live/live',
@@ -183,6 +204,26 @@ class Pytive:
             'https://www.mirrativ.com/api/live/live_comments',
             params={
                 'live_id': live_id
+            },
+            headers=dict(**self.common_headers, **{
+                'User-Agent': self.user_agent,
+                'Accept': '*/*',
+                'Accept-Language': 'ja-jp',
+                'Connection': 'keep-alive',
+                'x-referer': 'live_view',
+                'Cookie': 'lang={}; mr_id={}; f={};'.format(self.lang, self.id, self.unique)
+            })
+        )
+        if resp.status_code != 200:
+            return None
+        return AttrDict(resp.json())
+
+    def get_online_users(self, live_id: str, page: int = 1):
+        resp = self.session.get(
+            'https://www.mirrativ.com/api/live/online_users',
+            params={
+                'live_id': live_id,
+                'page': str(page)
             },
             headers=dict(**self.common_headers, **{
                 'User-Agent': self.user_agent,
