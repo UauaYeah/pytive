@@ -1,6 +1,5 @@
 # pytive
-Mirrativのコメントをpythonで！  
-これは人生初のpythonで、コードが汚い可能性？
+Bot用
 
 ## TODO
 - [x] 配信情報の取得
